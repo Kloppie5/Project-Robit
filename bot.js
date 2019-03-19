@@ -22,6 +22,14 @@ try { var Discord = require('discord.js');
 
 var bot = new Discord.Client();
 
+try { var cm = require('./cm.js');
+	logger.log(logger.Severity.Info, `Loaded command manager`);
+} catch (e) {
+	logger.log(logger.Severity.Critical, 'Critical failure starting command manager');
+	logger.log(logger.Severity.Critical, (e == null ? "-" : e.stack));
+	process.exit(1);
+}
+
 bot.on("ready", () => {
 	bot.user.setPresence({ status: 'online', game: { name: 'with discord.js'} });
 
@@ -37,6 +45,8 @@ bot.on("message", (message) => {
 	const command = args.shift().toLowerCase();
 
 	logger.log(logger.Severity.Info, `Command '${command}' called with args[${args}]`);
+	
+	cm.run(command, bot, message, args);
 });
 
 bot.on("presence", (user, status, _) => {
