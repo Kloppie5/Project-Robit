@@ -14,9 +14,7 @@ var Severity = {
 	Debug : 	{code: 7, name: "Debug", 		symbol: "D", color: "\x1b[36m"}
 }
 
-fs.mkdir("logs/", function(err) {
-	if (!err || err.code !== "EEXIST") throw err;
-});
+fs.mkdir("logs/", function(err) {});
 
 var filename = `logs/robit-${new Date().toISOString().slice(0,10)}-${uuid4}.log`;
 
