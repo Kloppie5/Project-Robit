@@ -1,18 +1,23 @@
+var config = require('./config.json');
 var logger = require('./logger.js');
 
 var commands = {};
 
-var reserved_commands = {
+var reserved_commands = [
 	"load",
 	"unload",
 	"reload",
 	"exit"
-};
+];
+
+commands["load"] = require('./commands/load.js');
+commands["unload"] = require('./commands/unload.js');
+commands["reload"] = require('./commands/reload.js');
 
 // public bool load ( string name, string path )
 function load (name, path) {
 	if (name in reserved_commands) {
-		logger.log(logger.Severity.Debug, `Could not load module with reserved name '${name}'`);		
+		logger.log(logger.Severity.Debug, `Could not load module with reserved name '${name}'`);
 		return false;
 	}
 	try {
@@ -27,11 +32,11 @@ function load (name, path) {
 // public bool unload ( string name )
 function unload (name) {
 	if (name in reserved_commands) {
-		logger.log(logger.Severity.Debug, `Could not unload module with reserved name '${name}'`);		
+		logger.log(logger.Severity.Debug, `Could not unload module with reserved name '${name}'`);
 		return false;
 	}
 	if (commands[name] == null) {
-		logger.log(logger.Severity.Debug, `Could not unload unknown module '${name}'`);		
+		logger.log(logger.Severity.Debug, `Could not unload unknown module '${name}'`);
 		return false;
 	}
 	commands[name] = null;
@@ -52,11 +57,12 @@ function run (command, bot, message, args) {
 		// Silently ignore unknown commands
 		return;
 	}
-	
+
 	var permission_level = commands[command].permission_level;
-	
+
 	if (permission_level == "@everyone"
-	//||  permission_level == "@<role>"      && message.member.roles.has(<role id>)
+	|| (permission_level == "@botowner"      && message.author.id == config.botownerid)
+	//|| (permission_level == "@<role>"      && message.member.roles.has(<role id>))
 	)
 		commands[command].run(bot, message, args);
 	else
