@@ -4,15 +4,17 @@ var logger = require('./logger.js');
 var commands = {};
 
 var reserved_commands = [
+	"exit",
+	"help",
 	"load",
-	"unload",
 	"reload",
-	"exit"
+	"unload",
 ];
 
+commands["help"] = require('./commands/help.js');
 commands["load"] = require('./commands/load.js');
-commands["unload"] = require('./commands/unload.js');
 commands["reload"] = require('./commands/reload.js');
+commands["unload"] = require('./commands/unload.js');
 
 // public bool load ( string name, string path )
 function load (name, path) {
