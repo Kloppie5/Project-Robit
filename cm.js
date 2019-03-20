@@ -33,7 +33,8 @@ function run (command, bot, message, args) {
 	var permission_level = commands[command].permission_level;
 	
 	if (permission_level == "@everyone"
-	//||  permission_level == "@<role>"      && message.member.roles.has(<role id>))
+	//||  permission_level == "@<role>"      && message.member.roles.has(<role id>)
+	)
 		commands[command].run(bot, message, args);
 	else
 		message.channel.send("You do not have the proper permissions to run this command.");
