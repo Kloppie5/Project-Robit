@@ -1,5 +1,6 @@
 var config = require('./config.json');
 var logger = require('./logger.js');
+var permissions = require('./permissions.js');
 
 var commands = {};
 
@@ -60,15 +61,7 @@ function run (command, bot, message, args) {
 		return;
 	}
 
-	var permission_level = commands[command].permission_level;
-
-	if (permission_level == "@everyone"
-	|| (permission_level == "@botowner"      && message.author.id == config.botownerid)
-	//|| (permission_level == "@<role>"      && message.member.roles.has(<role id>))
-	)
-		commands[command].run(bot, message, args);
-	else
-		message.channel.send("You do not have the proper permissions to run this command.");
+	commands[command].run(bot, message, args);
 }
 
 module.exports.load = load;

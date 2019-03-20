@@ -1,5 +1,5 @@
-var config = require('../config.json');
 var cm = require('../cm.js');
+var permissions = require('../permissions.js');
 
 module.exports = {
 	version: '1.0.0',
@@ -18,10 +18,8 @@ module.exports = {
         return;
       }
       var command = args[0];
-      if (cm.commands[command].permission_level == "@everyone"
-    	|| (cm.commands[command].permission_level == "@botowner"      && message.author.id == config.botownerid)
-    	//|| (permission_level == "@<role>"      && message.member.roles.has(<role id>))
-    	)
+
+      if ( permissions.validate[cm.commands[command].permission_level]( message ) )
       fields.push({
             name: `!${command} ${cm.commands[command].args}`,
             value: cm.commands[command].help
@@ -29,10 +27,7 @@ module.exports = {
     }
 
     for ( var command in cm.commands ) {
-      if (cm.commands[command].permission_level == "@everyone"
-    	|| (cm.commands[command].permission_level == "@botowner"      && message.author.id == config.botownerid)
-    	//|| (permission_level == "@<role>"      && message.member.roles.has(<role id>))
-    	)
+      if ( permissions.validate[cm.commands[command].permission_level]( message ) )
       fields.push({
             name: `!${command} ${cm.commands[command].args}`,
             value: cm.commands[command].help

@@ -6,6 +6,8 @@ module.exports = {
 	args: "<name>",
 	help: "Unloads an existing module.",
 	run: function(_, message, args) {
+		if ( permissions.validate["@botowner"]( message ) )
+      return;
 		if ( args.length != 1 ) {
 			message.channel.send("Invalid arguments.");
 			return;
