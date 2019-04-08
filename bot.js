@@ -33,6 +33,8 @@ try { var cm = require('./cm.js');
 bot.on("ready", () => {
 	bot.user.setPresence({ status: 'online', game: { name: 'with discord.js'} });
 
+	cm.load('funny', './commands/funny.js');
+
 	logger.log(logger.Severity.Info, "Bot is ready");
 });
 
@@ -45,7 +47,7 @@ bot.on("message", (message) => {
 	const command = args.shift().toLowerCase();
 
 	logger.log(logger.Severity.Info, `Command '${command}' called with args[${args}]`);
-	
+
 	cm.run(command, bot, message, args);
 });
 
