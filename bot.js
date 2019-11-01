@@ -34,6 +34,7 @@ bot.on("ready", () => {
 	bot.user.setPresence({ status: 'online', game: { name: 'with discord.js'} });
 
 	cm.load('funny', './commands/funny.js');
+	cm.load('dndquote', './commands/dndquote.js');
 
 	logger.log(logger.Severity.Info, "Bot is ready");
 });
