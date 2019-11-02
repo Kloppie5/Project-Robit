@@ -10,10 +10,11 @@ var reserved_commands = [
 	"load",
 	"reload",
 	"unload",
+	"version",
 ];
 
 commands["help"] = {
-	version: '1.0.0',
+	version: '1.3.0',
 	permission_level: "@everyone",
 	args: "(name)",
 	help: "Shows you all the commands you can use and their explanation.",
@@ -30,23 +31,23 @@ commands["help"] = {
       	}
       	var command = args[0];
 
-      	if ( !permissions.validate(cm.commands[command].permission_level, message) ) {
+      	if ( !permissions.validate(commands[command].permission_level, message) ) {
 					message.channel.send("You do not have the permissions to use this command.");
         	return;
 				}
       	fields.push({
-            name: `!${command} ${cm.commands[command].args}`,
-            value: cm.commands[command].help
+            name: `!${command} ${commands[command].args}`,
+            value: commands[command].help
       	});
-    }
-
-    for ( var command in cm.commands ) {
-      	if ( permissions.validate(cm.commands[command].permission_level, message) )
-      	fields.push({
-            name: `!${command} ${cm.commands[command].args}`,
-            value: cm.commands[command].help
-      	});
-    }
+    } else {
+	    for ( var command in commands ) {
+	      	if ( permissions.validate(commands[command].permission_level, message) )
+	      	fields.push({
+	            name: `!${command} ${commands[command].args}`,
+	            value: commands[command].help
+	      	});
+	    }
+		}
 
     message.channel.send({embed: {
 			color: 3447003,
@@ -66,7 +67,7 @@ commands["help"] = {
 	}
 };
 commands["load"] = {
-	version: '1.2.0',
+	version: '1.4.0',
 	permission_level: "@botowner",
 	args: "<name>",
 	help: "Loads an existing module.",
@@ -76,14 +77,22 @@ commands["load"] = {
 			return;
 		}
     var name = args[0];
-		if ( load(name) )
-			message.channel.send(`Loaded \`${name}.js\``);
-		else
-			message.channel.send(`Unable to load \`${name}.js\``);
+
+		if (reserved_commands.includes(name)) {
+			logger.log(logger.Severity.Debug, `Could not load module with reserved name '${name}'`);
+			message.channel.send(`Could not load module with reserved name '${name}'`);
+			return;
+		}
+		if ( load(name) ) {
+			message.channel.send(`Loaded module '${name}.js'`);
+			return;
+		}
+
+		message.channel.send(`Could not load module '${name}.js'`);
   }
 };
 commands["reload"] = {
-	version: '1.2.0',
+	version: '1.4.0',
 	permission_level: "@botowner",
 	args: "<name>",
 	help: "Reloads an existing module.",
@@ -93,18 +102,23 @@ commands["reload"] = {
 			return;
 		}
 		var name = args[0];
-		if ( unload(name) )
-			message.channel.send(`Unloaded \`${name}.js\``);
-		else
-			message.channel.send(`Unable to unload \`${name}.js\``);
-		if ( load(name) )
-				message.channel.send(`Loaded \`${name}.js\``);
-		else
-				message.channel.send(`Unable to load \`${name}.js\``);
+
+		if (reserved_commands.includes(name)) {
+			logger.log(logger.Severity.Debug, `Could not reload module with reserved name '${name}'`);
+			message.channel.send(`Could not reload module with reserved name '${name}'`);
+			return;
 		}
+
+		if ( unload(name) && load(name) ) {
+			message.channel.send(`Reloaded module '${name}.js'`);
+			return;
+		}
+
+		message.channel.send(`Could not reload module '${name}.js'`);
+	}
 };
 commands["unload"] = {
-	version: '1.2.0',
+	version: '1.4.0',
 	permission_level: "@botowner",
 	args: "<name>",
 	help: "Unloads an existing module.",
@@ -114,19 +128,41 @@ commands["unload"] = {
 			return;
 		}
 		var name = args[0];
-		if ( unload(name) )
-			message.channel.send(`Unloaded \`${name}.js\``);
-		else
-			message.channel.send(`Unable to unload \`${name}.js\``);
+
+		if (reserved_commands.includes(name)) {
+			logger.log(logger.Severity.Debug, `Could not unload module with reserved name '${name}'`);
+			message.channel.send(`Could not unload module with reserved name '${name}'`);
+			return false;
+		}
+		if ( unload(name) ) {
+			message.channel.send(`Unloaded module '${name}.js'`);
+			return;
+		}
+
+		message.channel.send(`Could not unload module '${name}.js'`);
+	}
+};
+commands["version"] = {
+	version: '1.3.0',
+	permission_level: "@botowner",
+	args: "(name)",
+	help: "Returns the version of the provided module",
+	run: function(_, message, args) {
+		if ( args.length != 1 ) {
+			message.channel.send("Invalid arguments.");
+			return;
+		}
+		var name = args[0];
+		if (commands[name] == null) {
+			message.channel.send(`Unknown module '${name}.js'`);
+			return;
+		}
+		message.channel.send(`${name}; v${commands[name].version}`);
 	}
 };
 
 // public bool load ( string name, string path )
 function load (name, path) {
-	if (name in reserved_commands) {
-		logger.log(logger.Severity.Debug, `Could not load module with reserved name '${name}'`);
-		return false;
-	}
 	try {
 		commands[name] = require(`./commands/${name}.js`);
 		logger.log(logger.Severity.Debug, `Loaded module '${name}'`);
@@ -138,10 +174,6 @@ function load (name, path) {
 }
 // public bool unload ( string name )
 function unload (name) {
-	if (name in reserved_commands) {
-		logger.log(logger.Severity.Debug, `Could not unload module with reserved name '${name}'`);
-		return false;
-	}
 	if (commands[name] == null) {
 		logger.log(logger.Severity.Debug, `Could not unload unknown module '${name}'`);
 		return false;
