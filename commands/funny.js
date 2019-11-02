@@ -10,6 +10,6 @@ module.exports = {
 			if(err) throw err;
 			var lines = data.split('\n');
 			message.channel.send(lines[Math.floor(Math.random()*lines.length)]);
-	  	});
-   	}
+	  });
+	}
 };
