@@ -1,0 +1,27 @@
+{
+  "name": "project-robit",
+  "version": "1.0.0",
+  "description": "Personal discord bot",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kloppie5/Project-Robit.git"
+  },
+  "keywords": [
+    "robit",
+    "discord",
+    "bot"
+  ],
+  "author": "Jeroen 'Kloppie5' 'Nox' Kloppenburg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kloppie5/Project-Robit/issues"
+  },
+  "homepage": "https://github.com/Kloppie5/Project-Robit#readme",
+  "dependencies": {
+    "discord.js": "^12.2.0"
+  }
+}
