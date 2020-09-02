@@ -35,10 +35,9 @@ bot.on('message', message => {
 	
 	const args = message.content.slice(config.prefix.length).split(/ +/);
 	const command = args.shift().toLowerCase();
-	console.info(`Called command: ${command}`);
 
 	if ( !bot.commands.has(command) ) {
-		message.reply(bot.commands);
+		console.info(`Called unknown command: ${command}`);
 		return;
 	}
 
